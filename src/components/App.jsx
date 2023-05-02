@@ -16,7 +16,7 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState(null);
-  const [totalHits, setTotalHits] = useState(0);
+  const [totalHits, setTotalHits] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -74,7 +74,9 @@ const App = () => {
       {isLoading && <Loader />}
 
       {showModal && <Modal modalData={modalData} closeModal={closeModal} />}
+      
       {images.length === 0 &&
+        totalHits === 0 &&
         searchQuery !== '' &&
         !isLoading &&
         error === null && (
