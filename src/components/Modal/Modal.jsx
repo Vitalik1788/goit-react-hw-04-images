@@ -1,48 +1,45 @@
-import { Component } from "react";
-import { Overlay, Modals } from "./Modal.styled";
-import { createPortal } from "react-dom";
+import { useEffect } from 'react';
+import { Overlay, Modals } from './Modal.styled';
+import { createPortal } from 'react-dom';
 import { PropTypes } from 'prop-types';
 
 const modalRoot = document.querySelector('#modal-root');
 
-export default class Modal extends Component {
-  static propTypes = {
-    closeModal: PropTypes.func.isRequired,
-    modalData: PropTypes.shape({
-      largeImageURL: PropTypes.string.isRequired,
-      tags: PropTypes.string.isRequired,
-    }),
-  };
-
-  componentDidMount() {
-    window.addEventListener('keydown', this.handleKeyDown);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleKeyDown);
-  }
-
-  handleKeyDown = e => {
-    if (e.code === 'Escape') {
-      this.props.closeModal();
+const Modal = ({ modalData, closeModal }) => {
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.code === 'Escape') {
+        closeModal();
+      }
     }
-  };
+    window.addEventListener('keydown', handleKeyDown);
 
-  handleBackdropClick = e => {
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [closeModal]);
+
+  function handleBackdropClick(e) {
     if (e.currentTarget === e.target) {
-      this.props.closeModal();
+      closeModal();
     }
-  };
-
-  render() {
-    const { largeImageURL, tags } = this.props.modalData;
-    return createPortal(
-      <Overlay onClick={this.handleBackdropClick}>
-        <Modals>
-          <img src={largeImageURL} alt={tags} />
-        </Modals>
-      </Overlay>,
-      modalRoot
-    );
   }
-}
+
+  const { largeImageURL, tags } = modalData;
+  return createPortal(
+    <Overlay onClick={handleBackdropClick}>
+      <Modals>
+        <img src={largeImageURL} alt={tags} />
+      </Modals>
+    </Overlay>,
+    modalRoot
+  );
+};
+
+export default Modal;
+
+Modal.propTypes = {
+  closeModal: PropTypes.func.isRequired,
+  modalData: PropTypes.shape({
+    largeImageURL: PropTypes.string.isRequired,
+    tags: PropTypes.string.isRequired,
+  }),
+};
